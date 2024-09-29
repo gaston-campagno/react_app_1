@@ -20,7 +20,7 @@ data "aws_key_pair" "existing_key" {
 resource "aws_key_pair" "my_key" {
   count      = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1 # Crea la clave solo si no existe
   key_name   = "my-ssh-key"
-  public_key = tls_private_key.ssh_key[0].public_key_openssh  # Acceso a la primera instancia
+  public_key = tls_private_key.ssh_key[0].public_key_openssh # Acceso a la primera instancia
 
   lifecycle {
     prevent_destroy = true # Evita que se destruya accidentalmente
