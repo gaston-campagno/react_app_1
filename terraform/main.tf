@@ -3,6 +3,14 @@ provider "aws" {
   region = "us-east-2"
 }
 
+# Verifica si el Security Group ya existe
+data "aws_security_group" "existing_k8s_sg" {
+  filter {
+    name   = "group-name"
+    values = ["k8s_security_group"]
+  }
+}
+
 # Security Group para la instancia EC2 (K8s Node)
 resource "aws_security_group" "k8s_sg" {
   name        = "k8s_security_group"
