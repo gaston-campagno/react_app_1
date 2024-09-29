@@ -6,10 +6,19 @@ provider "aws" {
 resource "tls_private_key" "ssh_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
+
+  count = length(data.aws_key_pair.existing_key.key_name) == 0 ? 1 : 0
+
 }
 
-# Crear un key pair de AWS usando la clave pública generada
+# Intentar obtener la clave SSH existente por su nombre
+data "aws_key_pair" "existing_key" {
+  key_name = "my-ssh-key"
+}
+
+# Crear el key pair de AWS solo si no existe
 resource "aws_key_pair" "my_key" {
+  count      = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1  # Crea la clave solo si no existe
   key_name   = "my-ssh-key"
   public_key = tls_private_key.ssh_key.public_key_openssh
 
