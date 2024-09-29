@@ -2,18 +2,12 @@
 provider "aws" {
   region = "us-east-2"
 }
-# Generar claves SSH solo si no existen
+
+# Crear el tls_private_key solo si la clave SSH no existe
 resource "tls_private_key" "ssh_key" {
+  count     = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1
   algorithm = "RSA"
-  rsa_bits  = 4096
-
-  count = length(data.aws_key_pair.existing_key.key_name) == 0 ? 1 : 0
-
-}
-
-# Intentar obtener la clave SSH existente por su nombre
-data "aws_key_pair" "existing_key" {
-  key_name = "my-ssh-key"
+  rsa_bits  = 2048
 }
 
 # Crear el key pair de AWS solo si no existe
