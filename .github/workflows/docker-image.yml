@@ -1,0 +1,49 @@
+name: Terraform CI
+
+on:
+  push:
+    branches:
+      - main  # Se ejecutará cuando haya un push a la rama main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Habilita la ejecución manual del workflow
+
+jobs:
+  terraform:
+    name: Run Terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform  # Se especifica la carpeta de Terraform
+
+      - name: Terraform Format Check
+        run: terraform fmt -check
+        working-directory: ./terraform  # Se especifica la carpeta de Terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./terraform  # Se especifica la carpeta de Terraform
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan
+        working-directory: ./terraform  # Se especifica la carpeta de Terraform
+
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        run: terraform apply -auto-approve
+        working-directory: ./terraform  # Se especifica la carpeta de Terraform
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
