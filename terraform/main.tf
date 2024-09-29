@@ -6,7 +6,7 @@ provider "aws" {
 # Security Group para la instancia EC2 (K8s Node)
 resource "aws_security_group" "k8s_sg" {
   name        = "k8s_security_group"
-  count = length(data.aws_security_group.existing_k8s_sg) == 0 ? 1 : 0
+  count       = length(data.aws_security_group.existing_k8s_sg) == 0 ? 1 : 0
   description = "Allow SSH, HTTP, and Kubernetes traffic"
   vpc_id      = var.vpc_id
 
