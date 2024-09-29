@@ -2,7 +2,21 @@
 provider "aws" {
   region = "us-east-2"
 }
+# Generar claves SSH solo si no existen
+resource "tls_private_key" "ssh_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
 
+# Crear un key pair de AWS usando la clave pública generada
+resource "aws_key_pair" "my_key" {
+  key_name   = "my-ssh-key"
+  public_key = tls_private_key.ssh_key.public_key_openssh
+
+  lifecycle {
+    prevent_destroy = true  # Evita que se destruya accidentalmente
+  }
+}
 # Verifica si el Security Group ya existe
 data "aws_security_group" "existing_k8s_sg" {
   filter {
@@ -76,6 +90,17 @@ resource "aws_spot_instance_request" "k8s_node" {
               sudo apt-get update -y
               sudo apt-get install -y kubelet kubeadm kubectl
               sudo systemctl enable kubelet && sudo systemctl start kubelet
+
+              # Inicializar el cluster de Kubernetes
+              sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+
+              # Configurar kubectl para el usuario regular
+              mkdir -p $HOME/.kube
+              sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+              sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+              # Instalar Flannel como CNI
+              kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel.yml
               EOF
 
   tags = {
