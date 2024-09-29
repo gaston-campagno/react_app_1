@@ -42,6 +42,28 @@ jobs:
         if: github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
         working-directory: ./terraform
+        
+      - name: Get Terraform Outputs
+        id: terraform_outputs
+        run: terraform output -json > outputs.json
+        working-directory: ./terraform
+
+      - name: Set Secrets (EC2 Instance ID and SSH Keys)
+        run: |
+          INSTANCE_ID=$(jq -r '.ec2_instance_id.value' < outputs.json)
+          echo "Setting EC2 instance ID as a secret..."
+          gh secret set EC2_INSTANCE_ID --body "$INSTANCE_ID"
+
+          if jq -e '.ssh_private_key.value' < outputs.json > /dev/null; then
+            echo "SSH_PRIVATE_KEY=$(jq -r .ssh_private_key.value < outputs.json)" >> $GITHUB_ENV
+            echo "Setting SSH private key secret..."
+            gh secret set SSH_PRIVATE_KEY --body "$SSH_PRIVATE_KEY"
+          fi
+          
+          if jq -e '.ssh_public_key.value' < outputs.json > /dev/null; then
+            echo "SSH_PUBLIC_KEY=$(jq -r .ssh_public_key.value < outputs.json)" >> $GITHUB_ENV
+            gh secret set SSH_PUBLIC_KEY --body "$SSH_PUBLIC_KEY"
+          fi
 
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
