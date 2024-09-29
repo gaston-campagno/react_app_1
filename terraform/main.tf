@@ -3,16 +3,21 @@ provider "aws" {
   region = "us-east-2"
 }
 
+# Intentar obtener la clave SSH existente por su nombre
+data "aws_key_pair" "existing_key" {
+  key_name = "my-ssh-key"
+}
+
 # Crear el tls_private_key solo si la clave SSH no existe
 resource "tls_private_key" "ssh_key" {
-  count     = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1
+  count     = length(data.aws_key_pair.existing_key.key_name) == 0 ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
 }
 
 # Crear el key pair de AWS solo si no existe
 resource "aws_key_pair" "my_key" {
-  count      = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1 # Crea la clave solo si no existe
+  count      = length(data.aws_key_pair.existing_key.key_name) == 0 ? 1 : 0 # Crea la clave solo si no existe
   key_name   = "my-ssh-key"
   public_key = tls_private_key.ssh_key[0].public_key_openssh # Acceso a la primera instancia
 
@@ -20,6 +25,7 @@ resource "aws_key_pair" "my_key" {
     prevent_destroy = true # Evita que se destruya accidentalmente
   }
 }
+
 # Verifica si el Security Group ya existe
 data "aws_security_group" "existing_k8s_sg" {
   filter {
