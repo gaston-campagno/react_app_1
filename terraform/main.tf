@@ -14,7 +14,7 @@ resource "aws_key_pair" "my_key" {
   public_key = tls_private_key.ssh_key.public_key_openssh
 
   lifecycle {
-    prevent_destroy = true  # Evita que se destruya accidentalmente
+    prevent_destroy = true # Evita que se destruya accidentalmente
   }
 }
 # Verifica si el Security Group ya existe
