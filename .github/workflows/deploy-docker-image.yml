@@ -1,0 +1,39 @@
+name: Deploy to EC2
+
+on:
+  workflow_run:
+    workflows: 
+      - "Terraform CI"  # Dependencia del workflow de Terraform
+      - "CI/Publish"    # Dependencia del workflow de Build
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}  # Solo si ambos workflows anteriores terminaron con éxito
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check EC2 Status
+        run: |
+          INSTANCE_STATE=$(aws ec2 describe-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }} --query 'Reservations[*].Instances[*].State.Name' --output text)
+          if [ "$INSTANCE_STATE" != "running" ]; then
+            echo "EC2 instance is not running. Exiting..."
+            exit 1
+          fi
+
+      - name: Set up SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: SSH into EC2 and Deploy to Kubernetes
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-ssh-key ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+          # Comandos de despliegue en el cluster Kubernetes
+          kubectl set image deployment/my-app-deployment my-app=${{ secrets.ECR_REPOSITORY_URI }}:latest
+          kubectl rollout status deployment/my-app-deployment
+          EOF
