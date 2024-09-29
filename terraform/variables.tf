@@ -19,5 +19,5 @@ variable "spot_price" {
 variable "ami_id" {
   description = "AMI ID for Ubuntu Server 20.04"
   type        = string
-  default     = "ami-0d5d6d9b1e1e07d12"  # Cambia según tu región
+  default     = "ami-0d5d6d9b1e1e07d12" # Cambia según tu región
 }

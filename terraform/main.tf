@@ -43,9 +43,9 @@ resource "aws_security_group" "k8s_sg" {
 
 # Instancia EC2 para el nodo de Kubernetes (Spot)
 resource "aws_spot_instance_request" "k8s_node" {
-  ami                  = var.ami_id
-  instance_type        = var.instance_type
-  spot_price           = var.spot_price
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  spot_price    = var.spot_price
 
   vpc_security_group_ids = [aws_security_group.k8s_sg.id]
 
