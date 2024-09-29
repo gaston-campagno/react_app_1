@@ -18,7 +18,7 @@ data "aws_key_pair" "existing_key" {
 
 # Crear el key pair de AWS solo si no existe
 resource "aws_key_pair" "my_key" {
-  count      = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1  # Crea la clave solo si no existe
+  count      = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1 # Crea la clave solo si no existe
   key_name   = "my-ssh-key"
   public_key = tls_private_key.ssh_key.public_key_openssh
 
