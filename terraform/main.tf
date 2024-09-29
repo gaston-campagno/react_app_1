@@ -56,7 +56,7 @@ resource "aws_spot_instance_request" "k8s_node" {
   instance_type = var.instance_type
   spot_price    = var.spot_price
 
-  vpc_security_group_ids = [aws_security_group.k8s_sg.id]
+  vpc_security_group_ids = length(aws_security_group.k8s_sg) > 0 ? [aws_security_group.k8s_sg[0].id] : []
 
   user_data = <<-EOF
               #!/bin/bash
