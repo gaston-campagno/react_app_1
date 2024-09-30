@@ -3,7 +3,6 @@ name: Deploy to EC2
 on:
   workflow_run:
     workflows: 
-      - "Terraform CI"  # Dependencia del workflow de Terraform
       - "CI/Publish"    # Dependencia del workflow de Build
     types:
       - completed
@@ -19,7 +18,7 @@ jobs:
 
       - name: Check EC2 Status
         run: |
-          INSTANCE_STATE=$(aws ec2 describe-instances --instance-ids ${{ secrets.EC2_INSTANCE_ID }} --query 'Reservations[*].Instances[*].State.Name' --output text)
+          INSTANCE_STATE=$(aws ec2 describe-instances --instance-ids ${{ vars.EC2_INSTANCE_ID }} --query 'Reservations[*].Instances[*].State.Name' --output text)
           if [ "$INSTANCE_STATE" != "running" ]; then
             echo "EC2 instance is not running. Exiting..."
             exit 1
@@ -32,7 +31,7 @@ jobs:
 
       - name: SSH into EC2 and Deploy to Kubernetes
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-ssh-key ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/my-ssh-key ec2-user@${{ vars.EC2_INSTANCE_IP }} << 'EOF'
           # Comandos de despliegue en el cluster Kubernetes
           kubectl set image deployment/my-app-deployment my-app=${{ secrets.ECR_REPOSITORY_URI }}:latest
           kubectl rollout status deployment/my-app-deployment
