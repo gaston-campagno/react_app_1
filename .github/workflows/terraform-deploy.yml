@@ -44,8 +44,8 @@ jobs:
 
       - name: Set Outputs
         run: |
-          echo "EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id || echo "not_found")" >> $GITHUB_ENV
-          echo "EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip || echo "not_found")" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_ID=$(terraform output -raw ec2_instance_id)" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip)" >> $GITHUB_ENV
         working-directory: ./terraform
         
     env:
