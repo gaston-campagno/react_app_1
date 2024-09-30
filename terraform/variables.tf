@@ -7,13 +7,13 @@ variable "vpc_id" {
 variable "instance_type" {
   description = "Type of EC2 instance"
   type        = string
-  default     = "t2.micro"
+  default     = "t3.medium"
 }
 
 variable "spot_price" {
   description = "Maximum price for spot instance"
   type        = string
-  default     = "0.011"
+  default     = "0.0416"
 }
 
 variable "ami_id" {

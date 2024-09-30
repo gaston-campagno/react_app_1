@@ -65,53 +65,56 @@ resource "aws_spot_instance_request" "k8s_node" {
 
   user_data = <<-EOF
               #!/bin/bash
-              # Actualizar e instalar Docker
-              sudo apt-get update -y
-              sudo apt-get install -y docker.io
-              sudo systemctl start docker
-              sudo systemctl enable docker
 
-              # Instalar kubectl
-              curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-              sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+                # Actualizar los paquetes del sistema
+                sudo apt-get update -y
 
-              # Instalar kubeadm y kubelet
-              sudo apt-get update -y && sudo apt-get install -y apt-transport-https ca-certificates curl
-              sudo curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-              sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-              sudo apt-get update -y
-              sudo apt-get install -y kubelet kubeadm kubectl
-              sudo systemctl enable kubelet && sudo systemctl start kubelet
+                # Instalar dependencias necesarias
+                sudo apt-get install -y apt-transport-https ca-certificates curl
 
-              # Inicializar el cluster de Kubernetes
-              sudo kubeadm init --pod-network-cidr=10.244.0.0/16
+                # Instalar Docker (necesario para Minikube)
+                sudo apt-get install -y docker.io
+                sudo systemctl enable docker
+                sudo systemctl start docker
 
-              # Configurar kubectl para el usuario regular
-              mkdir -p $HOME/.kube
-              sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-              sudo chown $(id -u):$(id -g) $HOME/.kube/config
+                # Agregar permisos para ejecutar Docker sin sudo
+                sudo usermod -aG docker ubuntu
 
-              # Instalar Flannel como CNI
-              kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel.yml
+                # Descargar e instalar Minikube
+                curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+                sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
-              # Verificar el estado de los pods
-              sleep 30
-              kubectl get pods --all-namespaces
+                # Descargar e instalar Kubectl
+                sudo apt-get update -y && sudo apt-get install -y kubectl
 
-              # Crear namespace para monitoring
-              kubectl create namespace monitoring
+                # Configurar permisos para Kubernetes
+                sudo chmod -R 777 /home/ubuntu/.kube /home/ubuntu/.minikube
+                sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube /home/ubuntu/.minikube
 
-              # Implementar Prometheus
-              kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
+                # Crear un servicio para iniciar Minikube automáticamente
+                echo "[Unit]
+                Description=Minikube Service
+                After=docker.service
 
-              # Implementar Grafana
-              kubectl apply -f https://raw.githubusercontent.com/grafana/helm-charts/main/charts/grafana/templates/deployment.yaml -n monitoring
+                [Service]
+                User=ubuntu
+                ExecStart=/usr/local/bin/minikube start --driver=none
+                Restart=always
 
-              # Exponer el servicio de Grafana como NodePort
-              kubectl expose service grafana --type=NodePort --name=grafana --namespace=monitoring --port=3000 --target-port=3000 --node-port=30000
+                [Install]
+                WantedBy=multi-user.target" | sudo tee /etc/systemd/system/minikube.service
 
-              # Verificar el estado de los pods
-              kubectl get pods --namespace=monitoring
+                # Habilitar el servicio de Minikube
+                sudo systemctl daemon-reload
+                sudo systemctl enable minikube.service
+                sudo systemctl start minikube.service
+
+                # Instalar Prometheus y Grafana (puedes modificar esto más tarde si lo haces desde el workflow)
+                kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
+                kubectl apply -f https://raw.githubusercontent.com/grafana/helm-charts/main/charts/grafana/templates/deployment.yaml
+
+                # Imprimir un mensaje de éxito
+                echo "Minikube, kubectl, Prometheus y Grafana instalados correctamente"
               EOF
 
 }
