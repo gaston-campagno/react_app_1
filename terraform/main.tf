@@ -3,9 +3,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# Security Group para la instancia EC2 (K8s Node)
-# Security Group para la instancia EC2 (K8s Node)
-# Security Group para la instancia EC2 (K8s Node)
 resource "aws_security_group" "k8s_sg" {
   name        = "k8s_security_group"
   description = "Allow SSH, HTTP, and Kubernetes traffic"
@@ -46,7 +43,6 @@ resource "aws_security_group" "k8s_sg" {
     to_port     = 30000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-
   }
 }
 
