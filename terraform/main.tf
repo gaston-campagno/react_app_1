@@ -3,9 +3,10 @@ provider "aws" {
   region = "us-east-2"
 }
 
+
 # Intentar obtener la clave SSH existente por su nombre
 data "aws_key_pair" "existing_key" {
-  key_name = "my-ssh-key" # Verifica que este nombre sea correcto
+  key_name = "my-ssh-key"
 }
 
 # Crear el tls_private_key solo si la clave SSH no existe
@@ -17,7 +18,7 @@ resource "tls_private_key" "ssh_key" {
 
 # Crear el key pair de AWS solo si no existe
 resource "aws_key_pair" "my_key" {
-  count      = length(data.aws_key_pair.existing_key.key_name) == 0 ? 1 : 0 # Crea la clave solo si no existe
+  count      = length(data.aws_key_pair.existing_key.key_name) == 0 ? 1 : 0
   key_name   = "my-ssh-key"
   public_key = tls_private_key.ssh_key[0].public_key_openssh
 
