@@ -53,7 +53,7 @@ resource "aws_spot_instance_request" "k8s_node" {
   spot_price    = var.spot_price
   key_name      = "my-ssh-key_1"
 
-  vpc_security_group_ids = length(aws_security_group.k8s_sg) > 0 ? [aws_security_group.k8s_sg[0].id] : []
+  vpc_security_group_ids = aws_security_group.k8s_sg.id != "" ? [aws_security_group.k8s_sg.id] : []
 
   tags = {
     Name = var.instance_name
