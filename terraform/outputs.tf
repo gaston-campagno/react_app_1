@@ -7,9 +7,8 @@ output "existing_key_name" {
   value = data.aws_key_pair.existing_key.key_name
 }
 
-output "ssh_private_key" {
-  value     = length(tls_private_key.ssh_key) > 0 ? tls_private_key.ssh_key[0].private_key_pem : "No key created"
-  sensitive = false
+output "existing_key" {
+  value = length(data.aws_key_pair.existing_key.key_name) > 0 ? data.aws_key_pair.existing_key.key_name : "No key found"
 }
 # Salida que muestra el ID de la instancia
 output "ec2_instance_id" {
