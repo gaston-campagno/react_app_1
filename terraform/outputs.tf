@@ -3,10 +3,13 @@ output "ec2_instance_public_ip" {
   value = aws_spot_instance_request.k8s_node.public_ip
 }
 
-# Output de la clave privada para usarla en el workflow
+output "existing_key_name" {
+  value = data.aws_key_pair.existing_key.key_name
+}
+
 output "ssh_private_key" {
   value     = length(tls_private_key.ssh_key) > 0 ? tls_private_key.ssh_key[0].private_key_pem : "No key created"
-  sensitive = false # Asegura que no se muestre en los logs de Terraform
+  sensitive = false
 }
 # Salida que muestra el ID de la instancia
 output "ec2_instance_id" {
