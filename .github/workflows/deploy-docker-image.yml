@@ -35,27 +35,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: SSH into EC2 and Set Up Kubernetes Tools
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }} << 'EOF'
-      
-          # Actualizar los paquetes y agregar la clave de firma de Google
-          sudo apt-get update -y
-          sudo apt-get install -y apt-transport-https ca-certificates curl
-          sudo curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-      
-          # Agregar el repositorio de Kubernetes
-          echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-      
-          # Actualizar la lista de paquetes e instalar kubectl
-          sudo apt-get update -y
-          sudo apt-get install -y kubectl
-      
-          # Verificar la instalación de kubectl
-          kubectl version --client
-      
-          EOF
-
       
       - name: SSH into EC2 and Deploy to Kubernetes
         run: |
