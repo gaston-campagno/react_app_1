@@ -6,6 +6,7 @@ on:
       - "CI/Publish"    # Dependencia del workflow de Build
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -17,8 +18,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check EC2 Status
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
-          INSTANCE_STATE=$(aws ec2 describe-instances --instance-ids ${{ vars.EC2_INSTANCE_ID }} --query 'Reservations[*].Instances[*].State.Name' --output text)
+          INSTANCE_STATE=$(aws ec2 describe-instances --instance-ids ${{ vars.EC2_INSTANCE_ID }} --query 'Reservations[*].Instances[*].State.Name' --output text --debug)
           if [ "$INSTANCE_STATE" != "running" ]; then
             echo "EC2 instance is not running. Exiting..."
             exit 1
