@@ -5,7 +5,7 @@ output "ec2_instance_public_ip" {
 
 # Salida de la clave
 output "ssh_private_key" {
-  value = tls_private_key.ssh_key[0].private_key_pem
+  value     = tls_private_key.ssh_key[0].private_key_pem
   sensitive = true
 }
 
