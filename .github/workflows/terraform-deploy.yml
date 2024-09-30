@@ -55,17 +55,35 @@ jobs:
         run: terraform output
         working-directory: ./terraform
 
+      - name: Debug outputs.json
+        run: cat outputs.json
+        
+      - name: Test jq parsing
+        run: |
+          jq -r '.ssh_private_key.value' < outputs.json
+
+
       - name: Set Secrets (EC2 Instance ID and SSH Keys)
+      - name: Check and set Terraform outputs
         run: |
           if [ -f outputs.json ]; then
+              # Debug: Verificar el contenido de outputs.json
+              echo "Debugging outputs.json:"
+              cat outputs.json
+              
+              # Extraer el EC2 instance ID
               INSTANCE_ID=$(jq -r '.ec2_instance_id.value' < outputs.json)
               echo "Setting EC2 instance ID as a secret..."
               gh secret set EC2_INSTANCE_ID --body "$INSTANCE_ID"
-      
+              
+              # Verificar si existe la clave SSH y agregarla al entorno
               if jq -e '.ssh_private_key.value' < outputs.json > /dev/null; then
+                  SSH_PRIVATE_KEY=$(jq -r .ssh_private_key.value < outputs.json)
                   echo "SSH_PRIVATE_KEY=$(jq -r .ssh_private_key.value < outputs.json)" >> $GITHUB_ENV
                   echo "Setting SSH private key secret..."
                   gh secret set SSH_PRIVATE_KEY --body "$SSH_PRIVATE_KEY"
+              else
+                  echo "No SSH private key found in outputs.json."
               fi
           else
               echo "Error: outputs.json not found."
