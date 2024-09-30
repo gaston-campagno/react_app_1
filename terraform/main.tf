@@ -60,20 +60,20 @@ data "aws_instance" "existing_instance" {
 
 # Instancia EC2 para el nodo de Kubernetes (Spot)
 resource "aws_spot_instance_request" "k8s_node" {
-  count         = length(data.aws_instance.existing_instance.ids) == 0 ? 1 : 0  # Solo crear si no existe
+  count         = length(data.aws_instance.existing_instance.ids) == 0 ? 1 : 0 # Solo crear si no existe
   ami           = var.ami_id
   instance_type = var.instance_type
   spot_price    = var.spot_price
-  key_name      = "my-ssh-key"  # Usar la clave SSH creada manualmente
+  key_name      = "my-ssh-key" # Usar la clave SSH creada manualmente
 
   vpc_security_group_ids = length(aws_security_group.k8s_sg) > 0 ? [aws_security_group.k8s_sg[0].id] : []
-  
+
   tags = {
-    Name = var.instance_name  # Puedes utilizar una variable para el nombre
+    Name = var.instance_name # Puedes utilizar una variable para el nombre
   }
 
   lifecycle {
-    create_before_destroy = true  # Permite reemplazar recursos de manera más fluida
+    create_before_destroy = true # Permite reemplazar recursos de manera más fluida
   }
 
   user_data = <<-EOF

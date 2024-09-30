@@ -24,5 +24,5 @@ variable "ami_id" {
 
 variable "instance_name" {
   description = "Name for the EC2 instance"
-  default     = "MyEC2Instance"  # Cambia según tu preferencia
+  default     = "MyEC2Instance" # Cambia según tu preferencia
 }
