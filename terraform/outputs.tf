@@ -4,7 +4,7 @@ output "ec2_instance_public_ip" {
 }
 
 output "ssh_private_key" {
-  value = length(data.aws_key_pair.existing_key.key_name) == 0 ? tls_private_key.ssh_key[0].private_key_pem : "No key created"
+  value     = length(data.aws_key_pair.existing_key.key_name) == 0 ? tls_private_key.ssh_key[0].private_key_pem : "No key created"
   sensitive = true
 }
 
