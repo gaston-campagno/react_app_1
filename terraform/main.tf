@@ -3,29 +3,6 @@ provider "aws" {
   region = "us-east-2"
 }
 
-variable "create_key" {
-  type    = bool
-  default = true
-}
-
-variable "create_key" {
-  type    = bool
-  default = true
-}
-
-resource "tls_private_key" "ssh_key" {
-  count     = var.create_key ? 1 : 0
-  algorithm = "RSA"
-  rsa_bits  = 2048
-}
-
-resource "aws_key_pair" "my_key" {
-  count      = var.create_key ? 1 : 0
-  key_name   = "my-ssh-key"
-  public_key = tls_private_key.ssh_key[0].public_key_openssh
-}
-
-
 # Verifica si el Security Group ya existe
 data "aws_security_group" "existing_k8s_sg" {
   filter {
@@ -73,13 +50,31 @@ resource "aws_security_group" "k8s_sg" {
   }
 }
 
+# Verifica si la instancia EC2 ya existe
+data "aws_instance" "existing_instance" {
+  filter {
+    name   = "tag:Name"
+    values = [var.instance_name]
+  }
+}
+
 # Instancia EC2 para el nodo de Kubernetes (Spot)
 resource "aws_spot_instance_request" "k8s_node" {
+  count         = length(data.aws_instance.existing_instance.ids) == 0 ? 1 : 0  # Solo crear si no existe
   ami           = var.ami_id
   instance_type = var.instance_type
   spot_price    = var.spot_price
+  key_name      = "my-ssh-key"  # Usar la clave SSH creada manualmente
 
   vpc_security_group_ids = length(aws_security_group.k8s_sg) > 0 ? [aws_security_group.k8s_sg[0].id] : []
+  
+  tags = {
+    Name = var.instance_name  # Puedes utilizar una variable para el nombre
+  }
+
+  lifecycle {
+    create_before_destroy = true  # Permite reemplazar recursos de manera más fluida
+  }
 
   user_data = <<-EOF
               #!/bin/bash
@@ -111,8 +106,4 @@ resource "aws_spot_instance_request" "k8s_node" {
               # Instalar Flannel como CNI
               kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel.yml
               EOF
-
-  tags = {
-    Name = "K8s-Node"
-  }
 }

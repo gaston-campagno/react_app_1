@@ -21,3 +21,8 @@ variable "ami_id" {
   type        = string
   default     = "ami-0862be96e41dcbf74"
 }
+
+variable "instance_name" {
+  description = "Name for the EC2 instance"
+  default     = "MyEC2Instance"  # Cambia según tu preferencia
+}
