@@ -43,13 +43,19 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: ./terraform
         
+      # Asegúrate de que este paso venga después de Terraform Apply
       - name: Run Terraform and generate outputs
         run: |
+          echo "Generating Terraform outputs..."
           terraform output -json > outputs.json
+          echo "Verifying outputs.json existence..."
+          if [ -f outputs.json ]; then
+            echo "File outputs.json created successfully."
+          else
+            echo "Error: outputs.json not created."
+            exit 1
+          fi
         working-directory: ./terraform
-
-      - name: List files after terraform output
-        run: ls -la ./terraform
 
       - name: List files after terraform output
         run: ls -la ./terraform
