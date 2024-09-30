@@ -5,7 +5,7 @@ provider "aws" {
 
 # Intentar obtener la clave SSH existente por su nombre
 data "aws_key_pair" "existing_key" {
-  key_name = "my-ssh-key"
+  key_name = "my-ssh-key" # Asegúrate de que este nombre sea el correcto
 }
 
 # Crear el tls_private_key solo si la clave SSH no existe
@@ -17,12 +17,12 @@ resource "tls_private_key" "ssh_key" {
 
 # Crear el key pair de AWS solo si no existe
 resource "aws_key_pair" "my_key" {
-  count      = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1 # Crea la clave solo si no existe
+  count      = data.aws_key_pair.existing_key.key_name != "" ? 0 : 1
   key_name   = "my-ssh-key"
-  public_key = tls_private_key.ssh_key[0].public_key_openssh # Acceso a la primera instancia
+  public_key = tls_private_key.ssh_key[0].public_key_openssh
 
   lifecycle {
-    prevent_destroy = true # Evita que se destruya accidentalmente
+    prevent_destroy = true
   }
 }
 
