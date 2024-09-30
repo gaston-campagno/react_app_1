@@ -64,7 +64,6 @@ jobs:
 
 
       - name: Set Secrets (EC2 Instance ID and SSH Keys)
-      - name: Check and set Terraform outputs
         run: |
           if [ -f outputs.json ]; then
               # Debug: Verificar el contenido de outputs.json
