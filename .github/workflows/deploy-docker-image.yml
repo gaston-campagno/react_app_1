@@ -38,7 +38,12 @@ jobs:
       - name: SSH into EC2 and Deploy to Kubernetes
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }} << 'EOF'
-          # Comandos de despliegue en el cluster Kubernetes
-          kubectl set image deployment/my-app-deployment my-app=${{ secrets.ECR_REPOSITORY_URI }}:latest
+          # Copiar el manifiesto de despliegue al servidor EC2
+          echo "${{ secrets.DEPLOYMENT_MANIFEST }}" > /tmp/deployment.yaml
+      
+          # Aplicar el manifiesto en Kubernetes
+          kubectl apply -f /tmp/deployment.yaml
+      
+          # Comprobar el estado del despliegue
           kubectl rollout status deployment/my-app-deployment
           EOF

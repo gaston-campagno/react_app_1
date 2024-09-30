@@ -3,14 +3,7 @@ provider "aws" {
   region = "us-east-2"
 }
 
-# Verifica si el Security Group ya existe
-data "aws_security_group" "existing_k8s_sg" {
-  filter {
-    name   = "group-name"
-    values = ["k8s_security_group"]
-  }
-}
-
+# Security Group para la instancia EC2 (K8s Node)
 # Security Group para la instancia EC2 (K8s Node)
 # Security Group para la instancia EC2 (K8s Node)
 resource "aws_security_group" "k8s_sg" {
@@ -53,6 +46,7 @@ resource "aws_security_group" "k8s_sg" {
     to_port     = 30000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+
   }
 }
 
@@ -61,7 +55,7 @@ resource "aws_spot_instance_request" "k8s_node" {
   ami           = var.ami_id
   instance_type = var.instance_type
   spot_price    = var.spot_price
-  key_name      = "my-ssh-key"
+  key_name      = "my-ssh-key_1"
 
   vpc_security_group_ids = length(aws_security_group.k8s_sg) > 0 ? [aws_security_group.k8s_sg[0].id] : []
 
