@@ -43,10 +43,13 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: ./terraform
         
-      - name: Get Terraform Outputs
-        id: terraform_outputs
-        run: terraform output -json > outputs.json
+      - name: Run Terraform and generate outputs
+        run: |
+          terraform output -json > outputs.json
         working-directory: ./terraform
+
+      - name: List files after terraform output
+        run: ls -la ./terraform
 
       - name: List files after terraform output
         run: ls -la ./terraform
