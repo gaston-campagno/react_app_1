@@ -41,10 +41,13 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }} << 'EOF'
           # Copiar el manifiesto de despliegue al servidor EC2
           echo "${{ vars.DEPLOYMENT_MANIFEST }}" > /tmp/deployment.yaml
+          
+          # Comprobar el acceso a kubectl
+          kubectl config current-context || { echo "Error: kubectl no está configurado."; exit 1; }
       
           # Aplicar el manifiesto en Kubernetes
-          kubectl apply -f /tmp/deployment.yaml
-      
+          kubectl apply -f /tmp/deployment.yaml || { echo "Error: Falló el apply."; exit 1; }
+          
           # Comprobar el estado del despliegue
-          kubectl rollout status deployment/my-app-deployment
+          kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue falló."; exit 1; }
           EOF
