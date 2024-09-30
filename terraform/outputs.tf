@@ -3,9 +3,6 @@ output "ec2_instance_public_ip" {
   value = aws_spot_instance_request.k8s_node.public_ip
 }
 
-output "existing_key_name" {
-  value = data.aws_key_pair.existing_key.key_name
-}
 
 output "ssh_private_key" {
   value     = tls_private_key.ssh_key[0].private_key_pem
