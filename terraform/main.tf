@@ -20,8 +20,8 @@ resource "tls_private_key" "ssh_key" {
 }
 
 resource "aws_key_pair" "my_key" {
-  count     = var.create_key ? 1 : 0
-  key_name  = "my-ssh-key"
+  count      = var.create_key ? 1 : 0
+  key_name   = "my-ssh-key"
   public_key = tls_private_key.ssh_key[0].public_key_openssh
 }
 
