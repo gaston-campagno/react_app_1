@@ -12,9 +12,9 @@ data "aws_security_group" "existing_k8s_sg" {
 }
 
 # Security Group para la instancia EC2 (K8s Node)
+# Security Group para la instancia EC2 (K8s Node)
 resource "aws_security_group" "k8s_sg" {
   name        = "k8s_security_group"
-  count       = length(data.aws_security_group.existing_k8s_sg) == 0 ? 1 : 0
   description = "Allow SSH, HTTP, and Kubernetes traffic"
   vpc_id      = var.vpc_id
 
@@ -69,6 +69,7 @@ resource "aws_spot_instance_request" "k8s_node" {
 
   user_data = <<-EOF
               #!/bin/bash
+              # Actualizar e instalar Docker
               sudo apt-get update -y
               sudo apt-get install -y docker.io
               sudo systemctl start docker
@@ -96,5 +97,25 @@ resource "aws_spot_instance_request" "k8s_node" {
 
               # Instalar Flannel como CNI
               kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/k8s-manifests/kube-flannel.yml
+
+              # Verificar el estado de los pods
+              sleep 30
+              kubectl get pods --all-namespaces
+
+              # Crear namespace para monitoring
+              kubectl create namespace monitoring
+
+              # Implementar Prometheus
+              kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/bundle.yaml
+
+              # Implementar Grafana
+              kubectl apply -f https://raw.githubusercontent.com/grafana/helm-charts/main/charts/grafana/templates/deployment.yaml -n monitoring
+
+              # Exponer el servicio de Grafana como NodePort
+              kubectl expose service grafana --type=NodePort --name=grafana --namespace=monitoring --port=3000 --target-port=3000 --node-port=30000
+
+              # Verificar el estado de los pods
+              kubectl get pods --namespace=monitoring
               EOF
+
 }
