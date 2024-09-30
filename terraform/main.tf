@@ -8,16 +8,21 @@ variable "create_key" {
   default = true
 }
 
-locals {
-  # Carga el valor de create_key desde el archivo key_status.tfvars
-  create_key = var.create_key
+variable "create_key" {
+  type    = bool
+  default = true
 }
 
 resource "tls_private_key" "ssh_key" {
-  count = local.create_key ? 1 : 0
-
+  count     = var.create_key ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 2048
+}
+
+resource "aws_key_pair" "my_key" {
+  count     = var.create_key ? 1 : 0
+  key_name  = "my-ssh-key"
+  public_key = tls_private_key.ssh_key[0].public_key_openssh
 }
 
 

@@ -2,15 +2,13 @@
 output "ec2_instance_public_ip" {
   value = aws_spot_instance_request.k8s_node.public_ip
 }
-
-# Salida de la clave
-output "ssh_private_key" {
-  value     = tls_private_key.ssh_key[0].private_key_pem
-  sensitive = true
+output "key_name" {
+  value = length(aws_key_pair.my_key) > 0 ? aws_key_pair.my_key[0].key_name : "No key created"
 }
 
-output "key_name" {
-  value = aws_key_pair.my_key[0].key_name
+output "ssh_private_key" {
+  value     = length(tls_private_key.ssh_key) > 0 ? tls_private_key.ssh_key[0].private_key_pem : "No private key created"
+  sensitive = true
 }
 # Salida que muestra el ID de la instancia
 output "ec2_instance_id" {
