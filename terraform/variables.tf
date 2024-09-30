@@ -10,12 +10,6 @@ variable "instance_type" {
   default     = "t3.medium"
 }
 
-variable "spot_price" {
-  description = "Maximum price for spot instance"
-  type        = string
-  default     = "0.0416"
-}
-
 variable "ami_id" {
   description = "AMI ID for Ubuntu Server 20.04"
   type        = string

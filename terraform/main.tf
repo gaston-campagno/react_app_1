@@ -46,11 +46,10 @@ resource "aws_security_group" "k8s_sg" {
   }
 }
 
-# Instancia EC2 para el nodo de Kubernetes (Spot)
-resource "aws_spot_instance_request" "k8s_node" {
+# Instancia EC2 para el nodo de Kubernetes (On-Demand)
+resource "aws_instance" "k8s_node" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  spot_price    = var.spot_price
   key_name      = "my-ssh-key_1"
 
   vpc_security_group_ids = aws_security_group.k8s_sg.id != "" ? [aws_security_group.k8s_sg.id] : []
