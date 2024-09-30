@@ -33,9 +33,13 @@ jobs:
         working-directory: ./terraform
 
       - name: Terraform Apply
-        if: github.event_name == 'push'
         run: terraform apply -auto-approve tfplan
         working-directory: ./terraform
+
+      - name: Set Secrets
+        run: |
+          echo "EC2_INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_PUBLIC_IP=${{ secrets.EC2_INSTANCE_PUBLIC_IP }}" >> $GITHUB_ENV
         
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
