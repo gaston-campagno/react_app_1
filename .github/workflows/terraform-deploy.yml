@@ -25,6 +25,17 @@ jobs:
         run: terraform init
         working-directory: ./terraform  # Se especifica la carpeta de Terraform
 
+      - name: Check for existing SSH Key
+        id: check_key
+        run: |
+          if ! aws ec2 describe-key-pairs --key-names my-ssh-key --query 'KeyPairs[*].KeyName' --output text; then
+            echo "Key not found, creating new key."
+            echo "key_found=false" >> $GITHUB_ENV
+          else
+            echo "Key found."
+            echo "key_found=true" >> $GITHUB_ENV
+          fi
+
       - name: Terraform Format Check
         run: terraform fmt -check
         working-directory: ./terraform
@@ -43,7 +54,11 @@ jobs:
         run: terraform apply -auto-approve tfplan
         working-directory: ./terraform
         
-      # Asegúrate de que este paso venga después de Terraform Apply
+      - name: Update key status
+        run: |
+          echo "create_key = false" > ./terraform/key_status.tfvars
+        working-directory: ./terraform
+
       - name: Run Terraform and generate outputs
         run: |
           echo "Generating Terraform outputs..."
