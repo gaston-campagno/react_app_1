@@ -72,7 +72,7 @@ resource "aws_spot_instance_request" "k8s_node" {
   }
 
   lifecycle {
-    create_before_destroy = true 
+    create_before_destroy = true
   }
 
   user_data = <<-EOF
