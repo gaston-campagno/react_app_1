@@ -8,8 +8,8 @@ output "existing_key_name" {
 }
 
 output "ssh_private_key" {
-  value     = length(tls_private_key.ssh_key) > 0 ? tls_private_key.ssh_key[0].private_key_pem : "No key created"
-  sensitive = false
+  value     = tls_private_key.ssh_key[0].private_key_pem
+  sensitive = true  # Marca la clave como sensible para ocultarla en la salida
 }
 # Salida que muestra el ID de la instancia
 output "ec2_instance_id" {
