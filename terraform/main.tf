@@ -50,14 +50,6 @@ resource "aws_security_group" "k8s_sg" {
   }
 }
 
-# Verifica si la instancia EC2 ya existe
-data "aws_instance" "existing_instance" {
-  filter {
-    name   = "tag:Name"
-    values = [var.instance_name]
-  }
-}
-
 # Instancia EC2 para el nodo de Kubernetes (Spot)
 resource "aws_spot_instance_request" "k8s_node" {
   ami           = var.ami_id
