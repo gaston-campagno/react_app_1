@@ -3,8 +3,9 @@ output "ec2_instance_public_ip" {
   value = aws_spot_instance_request.k8s_node.public_ip
 }
 
+# Salida de la clave
 output "ssh_private_key" {
-  value     = length(data.aws_key_pair.existing_key.key_name) == 0 ? tls_private_key.ssh_key[0].private_key_pem : "No key created"
+  value = tls_private_key.ssh_key[0].private_key_pem
   sensitive = true
 }
 
