@@ -40,7 +40,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }} << 'EOF'
           # Copiar el manifiesto de despliegue al servidor EC2
-          echo "${{ secrets.DEPLOYMENT_MANIFEST }}" > /tmp/deployment.yaml
+          echo "${{ vars.DEPLOYMENT_MANIFEST }}" > /tmp/deployment.yaml
       
           # Aplicar el manifiesto en Kubernetes
           kubectl apply -f /tmp/deployment.yaml
