@@ -55,3 +55,11 @@ jobs:
           # Comprobar el estado del despliegue
           kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue falló."; exit 1; }
           EOF
+
+      - name: Deploy Prometheus
+        run: |
+          kubectl apply -f k8s-manifests/prometheus.yaml
+      
+      - name: Deploy Grafana
+        run: |
+          kubectl apply -f k8s-manifests/grafana.yaml
