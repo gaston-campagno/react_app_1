@@ -42,6 +42,8 @@ jobs:
           # Copiar el manifiesto de despliegue al servidor EC2
           echo "${{ vars.DEPLOYMENT_MANIFEST }}" > /tmp/deployment.yaml
           echo "${{ vars.SERVICE_MANIFEST }}" > /tmp/service.yaml
+          echo "${{ vars.PROMETHEUS_MANIFEST }}" > /tmp/prometheus.yaml
+          echo "${{ vars.GRAFANA_MANIFEST }}" > /tmp/grafana.yaml
 
           # Comprobar el acceso a kubectl
           kubectl config current-context || { echo "Error: kubectl no está configurado."; exit 1; }
@@ -56,10 +58,10 @@ jobs:
           kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue falló."; exit 1; }
           # Aplicar el manifiesto de Prometheus
           kubectl apply -f /tmp/prometheus.yaml || { echo "Error: Falló el apply de Prometheus."; exit 1; }
-      
-          # Comprobar el estado del despliegue
-          kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue de la app falló."; exit 1; }
           kubectl rollout status deployment/prometheus || { echo "Error: El despliegue de Prometheus falló."; exit 1; }
+
+          kubectl apply -f /tmp/grafana.yaml || { echo "Error: Falló el apply de grafana."; exit 1; }
+          kubectl rollout status deployment/grafana || { echo "Error: El despliegue de grafana falló."; exit 1; }
           
           EOF
 
