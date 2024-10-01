@@ -54,12 +54,12 @@ jobs:
           
           # Comprobar el estado del despliegue
           kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue falló."; exit 1; }
+          # Aplicar el manifiesto de Prometheus
+          kubectl apply -f /tmp/prometheus.yaml || { echo "Error: Falló el apply de Prometheus."; exit 1; }
+      
+          # Comprobar el estado del despliegue
+          kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue de la app falló."; exit 1; }
+          kubectl rollout status deployment/prometheus || { echo "Error: El despliegue de Prometheus falló."; exit 1; }
+          
           EOF
 
-      - name: Deploy Prometheus
-        run: |
-          microk8s kubectl apply -f k8s-manifests/prometheus.yaml --validate=false
-      
-      - name: Deploy Grafana
-        run: |
-          microk8s kubectl apply -f k8s-manifests/grafana.yaml --validate=false
