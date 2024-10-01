@@ -1,70 +1,22 @@
-# Getting Started with Create React App
+La App es una app de React. 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Tengo 3 workflows diferentes.
 
-## Available Scripts
+Uno con el que construyo la infra en AWS e instalo en la instancia EC2 lo necesrio para correr el cluster de Kubernets.
+Seteo tambien la configuracion del Security Group y asigon par de claves SSh.
+Este wokrflow lo ejecuto manualmente.
 
-In the project directory, you can run:
+El segundo workflow es de CI y publish. 
+Este se ejecuta sobre main cuando hay un pull request hacia ella desde otra rama.
+Esto evita que cada rama feature sea publicada. Recien al mergearla, se buildea, se ejecutan los test unitarios, y finalmente se Dockeriza y sube a ECR, repositorio para imagenes Docker de AWS.
 
-### `npm start`
+El tercer workflow, se ejecuta cuando el anterior finaliza exitosamente, y es el workflow de despliegue, o Deploy.
+A travez de SSH me conecto a la instancia EC2, y aplico los manifiestos de deploy para kubernetes. Tanto para desplegar mi app que la traigo a la EC2 desde ECR, como para Prometheus y Grafana.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Finalmente las 3 apps se sirve en diferentes puertos, a los que se accede con la Elastic IP seteada, o sea un a ip fija.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+APP: http://18.220.242.204:30000/
 
-### `npm test`
+PROMETHEUS: http://18.220.242.204:31090/
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+GRAFANA: http://18.220.242.204:31000/
