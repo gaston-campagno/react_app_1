@@ -58,8 +58,8 @@ jobs:
 
       - name: Deploy Prometheus
         run: |
-          kubectl apply -f k8s-manifests/prometheus.yaml
+          microk8s kubectl apply -f k8s-manifests/prometheus.yaml --validate=false
       
       - name: Deploy Grafana
         run: |
-          kubectl apply -f k8s-manifests/grafana.yaml
+          microk8s kubectl apply -f k8s-manifests/grafana.yaml --validate=false
