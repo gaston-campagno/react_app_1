@@ -39,29 +39,27 @@ jobs:
       - name: SSH into EC2 and Deploy to Kubernetes
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ vars.EC2_INSTANCE_PUBLIC_IP }} << 'EOF'
-          # Copiar el manifiesto de despliegue al servidor EC2
           echo "${{ vars.DEPLOYMENT_MANIFEST }}" > /tmp/deployment.yaml
           echo "${{ vars.SERVICE_MANIFEST }}" > /tmp/service.yaml
           echo "${{ vars.CONFIG_MAP_PROMETHEUS }}" > /tmp/prometheus-config.yaml
           echo "${{ vars.PROMETHEUS_MANIFEST }}" > /tmp/prometheus.yaml
           echo "${{ vars.GRAFANA_MANIFEST }}" > /tmp/grafana.yaml
-
+          
           # Comprobar el acceso a kubectl
           kubectl config current-context || { echo "Error: kubectl no está configurado."; exit 1; }
-      
-          kubectl apply -f /tmp/deployment.yaml || { echo "Error: Falló el apply del deployment."; exit 1; }
-
-          kubectl apply -f /tmp/service.yaml || { echo "Error: Falló el apply del Configmap."; exit 1; }          
-
-          kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue falló."; exit 1; }
           
-          kubectl apply -f /tmp/prometheus-config.yaml || { echo "Error: Falló el apply de Prometheus."; exit 1; }
-
+          # Aplicar los manifiestos en el orden correcto
+          kubectl apply -f /tmp/deployment.yaml || { echo "Error: Falló el apply del deployment."; exit 1; }
+          kubectl apply -f /tmp/service.yaml || { echo "Error: Falló el apply del Service."; exit 1; }
+          kubectl apply -f /tmp/prometheus-config.yaml || { echo "Error: Falló el apply del ConfigMap."; exit 1; }
           kubectl apply -f /tmp/prometheus.yaml || { echo "Error: Falló el apply de Prometheus."; exit 1; }
-          kubectl rollout status deployment/prometheus || { echo "Error: El despliegue de Prometheus falló."; exit 1; }
-
           kubectl apply -f /tmp/grafana.yaml || { echo "Error: Falló el apply de grafana."; exit 1; }
-          kubectl rollout status deployment/grafana || { echo "Error: El despliegue de grafana falló."; exit 1; }
+          
+          # Verificar el estado de los despliegues
+          kubectl rollout status deployment/my-app-deployment || { echo "Error: El despliegue de my-app falló."; exit 1; }
+          kubectl rollout status deployment/prometheus || { echo "Error: El despliegue de Prometheus falló."; exit 1; }
+          kubectl rollout status deployment/grafana || { echo "Error: El despliegue de Grafana falló."; exit 1; }
+
           
           EOF
 
