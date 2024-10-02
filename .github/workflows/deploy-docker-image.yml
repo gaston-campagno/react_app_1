@@ -42,7 +42,7 @@ jobs:
           # Copiar el manifiesto de despliegue al servidor EC2
           echo "${{ vars.DEPLOYMENT_MANIFEST }}" > /tmp/deployment.yaml
           echo "${{ vars.SERVICE_MANIFEST }}" > /tmp/service.yaml
-          echo "${{ vars.CONFIG_MAP_PROMETHEUS }}" > /tmp/configmap.yaml
+          echo "${{ vars.CONFIG_MAP_PROMETHEUS }}" > /tmp/prometheus-config.yaml
           echo "${{ vars.PROMETHEUS_MANIFEST }}" > /tmp/prometheus.yaml
           echo "${{ vars.GRAFANA_MANIFEST }}" > /tmp/grafana.yaml
 
@@ -51,7 +51,7 @@ jobs:
       
           kubectl apply -f /tmp/deployment.yaml || { echo "Error: Falló el apply del deployment."; exit 1; }
 
-          kubectl apply -f /tmp/configmap.yaml || { echo "Error: Falló el apply del Configmap."; exit 1; }          
+          kubectl apply -f /tmp/prometheus-config.yaml || { echo "Error: Falló el apply del Configmap."; exit 1; }          
           kubectl rollout status deployment/configmap || { echo "Error: El Configmap falló."; exit 1; }
           
           kubectl apply -f /tmp/prometheus.yaml || { echo "Error: Falló el apply de Prometheus."; exit 1; }
