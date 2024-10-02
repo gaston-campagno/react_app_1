@@ -3,8 +3,8 @@ provider "aws" {
   region = "us-east-2"
 }
 
-resource "aws_security_group" "k8s_sg" {
-  name        = "k8s_security_group"
+resource "aws_security_group" "k8s_sg_1" {
+  name        = "k8s_security_group_1"
   description = "Allow SSH, HTTP, and Kubernetes traffic"
   vpc_id      = var.vpc_id
 
@@ -52,7 +52,7 @@ resource "aws_instance" "k8s_node" {
   instance_type = var.instance_type
   key_name      = "my-ssh-key_1"
 
-  vpc_security_group_ids = aws_security_group.k8s_sg.id != "" ? [aws_security_group.k8s_sg.id] : []
+  vpc_security_group_ids = aws_security_group.k8s_sg_1.id != "" ? [aws_security_group.k8s_sg_1.id] : []
 
   tags = {
     Name = var.instance_name

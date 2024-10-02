@@ -1,5 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
+import Metrics from './Metrics';
+
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
           Learn React
         </a>
       </header>
+      <Metrics /> {/* Aquí se mostrarán las métricas */}
     </div>
   );
 }
