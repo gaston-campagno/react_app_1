@@ -26,7 +26,7 @@ FROM node:16.14.2 AS metrics
 WORKDIR /app
 
 # Copiar el código de Node.js para exponer las métricas
-COPY server/server.js ./server.js
+COPY server.js ./
 
 # Instalar dependencias necesarias para el servidor de métricas
 COPY package*.json ./
