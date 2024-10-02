@@ -40,10 +40,10 @@ jobs:
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URI }}
 
       - name: Build Docker image
-        run: docker build -t my-app .
+        run: docker build -t my-app-1 .
 
       - name: Tag Docker image for ECR
-        run: docker tag my-app:latest ${{ secrets.ECR_REPOSITORY_URI }}:latest
+        run: docker tag my-app-1:latest ${{ secrets.ECR_REPOSITORY_URI }}:latest
 
       - name: Push Docker image to ECR
         run: docker push ${{ secrets.ECR_REPOSITORY_URI }}:latest
