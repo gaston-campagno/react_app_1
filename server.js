@@ -1,5 +1,5 @@
 const express = require('express');
-const { metrics, requestCounterMiddleware } = require('../metrics/metrics');
+const { metrics, requestCounterMiddleware } = require('./metrics/metrics');
 
 const app = express();
 const port = 4000;
