@@ -27,7 +27,7 @@ WORKDIR /app
 
 # Copiar el código de Node.js para exponer las métricas
 COPY server.js ./
-
+COPY metrics ./metrics/
 # Instalar dependencias necesarias para el servidor de métricas
 COPY package*.json ./
 
