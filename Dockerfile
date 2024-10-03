@@ -37,4 +37,4 @@ RUN npm install
 EXPOSE 4000
 
 # Ejecutar ambos servidores en paralelo usando supervisord o similar
-CMD ["sh", "-c", "nginx -g 'daemon off;' & node server.js"]
+CMD ["/usr/bin/supervisord"]
